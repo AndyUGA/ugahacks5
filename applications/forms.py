@@ -26,11 +26,13 @@ class ApplicationForm(OverwriteOnlyModelFormMixin, BetterModelForm):
     university = forms.CharField(required=True,
                                  label='What university do you study at?',
                                  help_text='Current or most recent school you attended.',
+                                 initial='N/A',
                                  widget=forms.TextInput(
                                      attrs={'class': 'typeahead-schools', 'autocomplete': 'off'}))
 
     degree = forms.CharField(required=True, label='What\'s your major/degree?',
                              help_text='Current or most recent degree you\'ve received',
+                             initial='N/A',
                              widget=forms.TextInput(
                                  attrs={'class': 'typeahead-degrees', 'autocomplete': 'off'}))
 
@@ -199,6 +201,21 @@ class ApplicationForm(OverwriteOnlyModelFormMixin, BetterModelForm):
         participant = self.cleaned_data['participant']
         if participant == 'Mentor' and not data:
             raise forms.ValidationError("Please tell us if you would like to host a workshop")
+        return data
+
+    def clean_university(self):
+        data = self.cleaned_data['university']
+        participant = self.cleaned_data['participant']
+        if (participant == 'Hacker' or participant == 'Volunteer') and data == 'N/A':
+            raise forms.ValidationError("Please tell us what university you study at")
+        return data
+
+
+    def clean_degree(self):
+        data = self.cleaned_data['degree']
+        participant = self.cleaned_data['participant']
+        if (participant == 'Hacker' or participant == 'Volunteer') and data == 'N/A':
+            raise forms.ValidationError("Please tell us what your major/degree is")
         return data
 
 
